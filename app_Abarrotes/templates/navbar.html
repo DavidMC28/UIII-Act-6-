@@ -1,0 +1,182 @@
+<!-- Barra de navegación lateral -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h4><i class="fas fa-store"></i> Mi Abarrotes</h4>
+    </div>
+    
+    <ul class="sidebar-menu">
+        <!-- Inicio -->
+        <li>
+            <a href="{% url 'inicio' %}">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+        </li>
+
+        <!-- Empleados -->
+        <li>
+            <a href="#empleados-submenu" data-bs-toggle="collapse" class="dropdown-toggle">
+                <i class="fas fa-users"></i> Empleados
+            </a>
+            <ul class="collapse list-unstyled submenu" id="empleados-submenu">
+                <li><a href="{% url 'agregar_empleado' %}"><i class="fas fa-plus"></i> Agregar</a></li>
+                <li><a href="{% url 'ver_empleados' %}"><i class="fas fa-list"></i> Ver Todos</a></li>
+                <li><a href="{% url 'ver_empleados' %}"><i class="fas fa-edit"></i> Editar (Desde Lista)</a></li>
+                <li><a href="{% url 'ver_empleados' %}"><i class="fas fa-trash"></i> Eliminar (Desde Lista)</a></li>
+            </ul>
+        </li>
+
+        <!-- Ventas -->
+        <li>
+            <a href="#ventas-submenu" data-bs-toggle="collapse" class="dropdown-toggle">
+                <i class="fas fa-cash-register"></i> Ventas
+            </a>
+            <ul class="collapse list-unstyled submenu" id="ventas-submenu">
+                <li><a href="{% url 'agregar_venta' %}"><i class="fas fa-plus"></i> Agregar</a></li>
+                <li><a href="{% url 'ver_ventas' %}"><i class="fas fa-list"></i> Ver Todas</a></li>
+                <li><a href="{% url 'ver_ventas' %}"><i class="fas fa-edit"></i> Editar (Desde Lista)</a></li>
+                <li><a href="{% url 'ver_ventas' %}"><i class="fas fa-trash"></i> Eliminar (Desde Lista)</a></li>
+            </ul>
+        </li>
+
+        <!-- Clientes -->
+        <li>
+            <a href="#clientes-submenu" data-bs-toggle="collapse" class="dropdown-toggle">
+                <i class="fas fa-user-friends"></i> Clientes
+            </a>
+            <ul class="collapse list-unstyled submenu" id="clientes-submenu">
+                <li><a href="{% url 'agregar_cliente' %}"><i class="fas fa-plus"></i> Agregar</a></li>
+                <li><a href="{% url 'ver_clientes' %}"><i class="fas fa-list"></i> Ver Todos</a></li>
+                <li><a href="{% url 'ver_clientes' %}"><i class="fas fa-edit"></i> Editar (Desde Lista)</a></li>
+                <li><a href="{% url 'ver_clientes' %}"><i class="fas fa-trash"></i> Eliminar (Desde Lista)</a></li>
+            </ul>
+        </li>
+
+        <!-- Productos -->
+        <li>
+            <a href="#productos-submenu" data-bs-toggle="collapse" class="dropdown-toggle">
+                <i class="fas fa-boxes"></i> Productos
+            </a>
+            <ul class="collapse list-unstyled submenu" id="productos-submenu">
+                <li><a href="{% url 'agregar_producto' %}"><i class="fas fa-plus"></i> Agregar</a></li>
+                <li><a href="{% url 'ver_productos' %}"><i class="fas fa-list"></i> Ver Todos</a></li>
+                <li><a href="{% url 'ver_productos' %}"><i class="fas fa-edit"></i> Editar (Desde Lista)</a></li>
+                <li><a href="{% url 'ver_productos' %}"><i class="fas fa-trash"></i> Eliminar (Desde Lista)</a></li>
+            </ul>
+        </li>
+
+        <!-- Proveedores -->
+        <li>
+            <a href="#proveedores-submenu" data-bs-toggle="collapse" class="dropdown-toggle">
+                <i class="fas fa-truck"></i> Proveedores
+            </a>
+            <ul class="collapse list-unstyled submenu" id="proveedores-submenu">
+                <li><a href="{% url 'agregar_proveedor' %}"><i class="fas fa-plus"></i> Agregar</a></li>
+                <li><a href="{% url 'ver_proveedores' %}"><i class="fas fa-list"></i> Ver Todos</a></li>
+                <li><a href="{% url 'ver_proveedores' %}"><i class="fas fa-edit"></i> Editar (Desde Lista)</a></li>
+                <li><a href="{% url 'ver_proveedores' %}"><i class="fas fa-trash"></i> Eliminar (Desde Lista)</a></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<style>
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 280px;
+        background: #2c3e50;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    
+    .sidebar-header {
+        padding: 20px;
+        background: #34495e;
+        text-align: center;
+        border-bottom: 1px solid #46627f;
+    }
+    
+    .sidebar-header h4 {
+        color: white;
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .sidebar-header i {
+        margin-right: 10px;
+        color: #3498db;
+    }
+    
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .sidebar-menu li {
+        position: relative;
+    }
+    
+    .sidebar-menu a {
+        display: block;
+        padding: 12px 20px;
+        color: #bdc3c7;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+    
+    .sidebar-menu a:hover {
+        color: white;
+        background: #34495e;
+        border-left: 4px solid #3498db;
+    }
+    
+    .sidebar-menu a.active {
+        color: white;
+        background: #34495e;
+        border-left: 4px solid #3498db;
+    }
+    
+    .sidebar-menu i {
+        width: 25px;
+        font-size: 16px;
+    }
+    
+    .submenu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background: #34495e;
+    }
+    
+    .submenu li a {
+        padding: 10px 20px 10px 50px;
+        font-size: 14px;
+        background: #2c3e50;
+    }
+    
+    .submenu li a:hover {
+        background: #3c5166;
+    }
+    
+    .dropdown-toggle::after {
+        float: right;
+        margin-top: 8px;
+    }
+    
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+        }
+        
+        body {
+            padding-left: 0;
+        }
+    }
+</style>

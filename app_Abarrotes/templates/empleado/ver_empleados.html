@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Ver Empleados{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Lista de Empleados</h1>
+    <a href="{% url 'agregar_empleado' %}" class="btn btn-primary mb-3">Agregar Empleado</a>
+
+    {% if empleados %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Puesto</th>
+                        <th>Salario</th>
+                        <th>Fecha de Contratación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for empleado in empleados %}
+                        <tr>
+                            <td>
+                                {% if empleado.foto %}
+                                    <img src="{{ empleado.foto.url }}" alt="{{ empleado.nombre }} {{ empleado.apellido }}" width="50" height="50" class="rounded-circle">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/50" alt="Sin Foto" width="50" height="50" class="rounded-circle"> {# Placeholder si no hay foto #}
+                                {% endif %}
+                            </td>
+                            <td>{{ empleado.nombre }}</td>
+                            <td>{{ empleado.apellido }}</td>
+                            <td>{{ empleado.puesto }}</td>
+                            <td>${{ empleado.salario }}</td>
+                            <td>{{ empleado.fecha_contratacion }}</td>
+                            <td>
+                                <a href="{% url 'actualizar_empleado' empleado.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                                <a href="{% url 'borrar_empleado' empleado.pk %}" class="btn btn-sm btn-danger">Borrar</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No hay empleados registrados.</p>
+    {% endif %}
+{% endblock %}

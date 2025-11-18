@@ -1,0 +1,421 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Venta{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Editar Venta #{{ venta.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Mensajes de error/success -->
+                    {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" id="ventaForm">
+                        {% csrf_token %}
+                        
+                        <!-- Información básica de la venta -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Cliente *</label>
+                                {{ venta_form.id_cliente }}
+                                {% if venta_form.id_cliente.errors %}
+                                <div class="text-danger small">
+                                    {{ venta_form.id_cliente.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Empleado *</label>
+                                {{ venta_form.id_empleado }}
+                                {% if venta_form.id_empleado.errors %}
+                                <div class="text-danger small">
+                                    {{ venta_form.id_empleado.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Sección de productos -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5><i class="fas fa-boxes me-2"></i>Productos de la Venta</h5>
+                                <button type="button" class="btn btn-primary btn-sm" id="agregarProducto">
+                                    <i class="fas fa-plus me-1"></i>Agregar Producto
+                                </button>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <small><i class="fas fa-info-circle me-1"></i>Puede agregar o eliminar productos de esta venta. Use el botón "Agregar Producto" para incluir más items.</small>
+                            </div>
+
+                            <div id="productos-container">
+                                <!-- Productos existentes -->
+                                {% for detalle in detalles %}
+                                <div class="producto-item card mb-3">
+                                    <div class="card-body">
+                                        <div class="row align-items-end">
+                                            <div class="col-md-5">
+                                                <label class="form-label">Producto *</label>
+                                                <select name="producto" class="form-select producto-select" required>
+                                                    <option value="">Seleccionar producto...</option>
+                                                    {% for producto in productos %}
+                                                    <option value="{{ producto.id }}" 
+                                                            data-precio="{{ producto.precio }}" 
+                                                            data-stock="{{ producto.existencias }}"
+                                                            data-nombre="{{ producto.nombre }}"
+                                                            {% if detalle.producto.id == producto.id %}selected{% endif %}>
+                                                        {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.existencias }})
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                                <div class="form-text stock-info text-success">
+                                                    {% for producto in productos %}
+                                                        {% if detalle.producto.id == producto.id %}
+                                                            Stock disponible: {{ producto.existencias }}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">Cantidad *</label>
+                                                <input type="number" name="cantidad" class="form-control cantidad-input" 
+                                                       min="1" value="{{ detalle.cantidad }}" required>
+                                                <div class="form-text stock-warning text-danger d-none"></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">Precio Unitario *</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" name="precio" class="form-control precio-input" 
+                                                           step="0.01" min="0" value="{{ detalle.precio_unitario }}" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <label class="form-label">Subtotal</label>
+                                                <input type="text" class="form-control subtotal-input" 
+                                                       value="${{ detalle.subtotal }}" readonly>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <label class="form-label">&nbsp;</label>
+                                                <button type="button" class="btn btn-danger btn-sm w-100 eliminar-producto">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Total de la venta -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">Total de la Venta:</h5>
+                                            <h4 class="mb-0 text-success" id="total-venta">${{ venta.total }}</h4>
+                                        </div>
+                                        <input type="hidden" name="total" id="total-input" value="{{ venta.total }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <h6 class="mb-1">Productos en la venta:</h6>
+                                        <h3 class="mb-0" id="contador-productos">{{ detalles.count }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'ver_ventas' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-warning" id="submit-btn">
+                                <i class="fas fa-save me-1"></i>Actualizar Venta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template para nuevos productos -->
+<template id="producto-template">
+    <div class="producto-item card mb-3">
+        <div class="card-body">
+            <div class="row align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label">Producto *</label>
+                    <select name="producto" class="form-select producto-select" required>
+                        <option value="">Seleccionar producto...</option>
+                        {% for producto in productos %}
+                        <option value="{{ producto.id }}" 
+                                data-precio="{{ producto.precio }}" 
+                                data-stock="{{ producto.existencias }}"
+                                data-nombre="{{ producto.nombre }}">
+                            {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.existencias }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text stock-info text-success"></div>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Cantidad *</label>
+                    <input type="number" name="cantidad" class="form-control cantidad-input" min="1" value="1" required>
+                    <div class="form-text stock-warning text-danger d-none"></div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Precio Unitario *</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" name="precio" class="form-control precio-input" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">Subtotal</label>
+                    <input type="text" class="form-control subtotal-input" value="$0.00" readonly>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="button" class="btn btn-danger btn-sm w-100 eliminar-producto">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productosContainer = document.getElementById('productos-container');
+    const agregarBtn = document.getElementById('agregarProducto');
+    const productoTemplate = document.getElementById('producto-template');
+    const totalVentaElement = document.getElementById('total-venta');
+    const totalInput = document.getElementById('total-input');
+    const contadorProductos = document.getElementById('contador-productos');
+    const submitBtn = document.getElementById('submit-btn');
+
+    // Función para agregar nuevo producto
+    agregarBtn.addEventListener('click', function() {
+        const nuevoProducto = productoTemplate.content.cloneNode(true);
+        productosContainer.appendChild(nuevoProducto);
+        actualizarContadorProductos();
+        actualizarTotal();
+        
+        // Habilitar botones eliminar si hay más de un producto
+        actualizarBotonesEliminar();
+    });
+
+    // Función para eliminar producto
+    productosContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.eliminar-producto')) {
+            const productoItem = e.target.closest('.producto-item');
+            // Permitir eliminar solo si hay más de un producto
+            if (document.querySelectorAll('.producto-item').length > 1) {
+                productoItem.remove();
+                actualizarContadorProductos();
+                actualizarTotal();
+                actualizarBotonesEliminar();
+            }
+        }
+    });
+
+    // Función para actualizar precios automáticamente y validar stock
+    productosContainer.addEventListener('change', function(e) {
+        if (e.target.classList.contains('producto-select')) {
+            const productoItem = e.target.closest('.producto-item');
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            const precio = selectedOption.dataset.precio;
+            const stock = parseInt(selectedOption.dataset.stock);
+            const nombre = selectedOption.dataset.nombre;
+            const precioInput = productoItem.querySelector('.precio-input');
+            const stockInfo = productoItem.querySelector('.stock-info');
+            const cantidadInput = productoItem.querySelector('.cantidad-input');
+            
+            if (precio && precioInput) {
+                precioInput.value = precio;
+                stockInfo.textContent = `Stock disponible: ${stock}`;
+                
+                // Validar stock inicial
+                validarStock(productoItem, cantidadInput.value, stock, nombre);
+            }
+            calcularSubtotal(productoItem);
+        }
+    });
+
+    // Función para validar stock
+    function validarStock(productoItem, cantidad, stock, nombreProducto) {
+        const warningElement = productoItem.querySelector('.stock-warning');
+        const cantidadInput = productoItem.querySelector('.cantidad-input');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        if (parseInt(cantidad) > stock) {
+            warningElement.textContent = `Stock insuficiente! Máximo: ${stock}`;
+            warningElement.classList.remove('d-none');
+            cantidadInput.classList.add('is-invalid');
+            submitBtn.disabled = true;
+        } else {
+            warningElement.classList.add('d-none');
+            cantidadInput.classList.remove('is-invalid');
+            submitBtn.disabled = false;
+        }
+    }
+
+    // Función para calcular subtotal cuando cambia cantidad o precio
+    productosContainer.addEventListener('input', function(e) {
+        if (e.target.classList.contains('cantidad-input') || e.target.classList.contains('precio-input')) {
+            const productoItem = e.target.closest('.producto-item');
+            
+            // Validar stock si es cantidad
+            if (e.target.classList.contains('cantidad-input')) {
+                const productoSelect = productoItem.querySelector('.producto-select');
+                const selectedOption = productoSelect.options[productoSelect.selectedIndex];
+                if (selectedOption.value) {
+                    const stock = parseInt(selectedOption.dataset.stock);
+                    const nombre = selectedOption.dataset.nombre;
+                    validarStock(productoItem, e.target.value, stock, nombre);
+                }
+            }
+            
+            calcularSubtotal(productoItem);
+        }
+    });
+
+    // Función para calcular subtotal de un producto
+    function calcularSubtotal(productoItem) {
+        const cantidad = parseFloat(productoItem.querySelector('.cantidad-input').value) || 0;
+        const precio = parseFloat(productoItem.querySelector('.precio-input').value) || 0;
+        const subtotal = cantidad * precio;
+        productoItem.querySelector('.subtotal-input').value = '$' + subtotal.toFixed(2);
+        actualizarTotal();
+    }
+
+    // Función para actualizar el total general
+    function actualizarTotal() {
+        let total = 0;
+        document.querySelectorAll('.producto-item').forEach(item => {
+            const cantidad = parseFloat(item.querySelector('.cantidad-input').value) || 0;
+            const precio = parseFloat(item.querySelector('.precio-input').value) || 0;
+            total += cantidad * precio;
+        });
+        totalVentaElement.textContent = '$' + total.toFixed(2);
+        totalInput.value = total.toFixed(2);
+    }
+
+    // Función para actualizar contador de productos
+    function actualizarContadorProductos() {
+        const count = document.querySelectorAll('.producto-item').length;
+        contadorProductos.textContent = count;
+    }
+
+    // Función para actualizar botones eliminar
+    function actualizarBotonesEliminar() {
+        const botonesEliminar = document.querySelectorAll('.eliminar-producto');
+        const count = botonesEliminar.length;
+        
+        // Solo deshabilitar si hay un solo producto
+        if (count === 1) {
+            botonesEliminar[0].disabled = true;
+            botonesEliminar[0].classList.replace('btn-danger', 'btn-outline-danger');
+        } else {
+            botonesEliminar.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.replace('btn-outline-danger', 'btn-danger');
+            });
+        }
+    }
+
+    // Validación antes de enviar el formulario
+    document.getElementById('ventaForm').addEventListener('submit', function(e) {
+        const productos = document.querySelectorAll('.producto-item');
+        let tieneProductosValidos = false;
+        
+        productos.forEach(item => {
+            const productoSelect = item.querySelector('.producto-select');
+            if (productoSelect.value) {
+                tieneProductosValidos = true;
+            }
+        });
+        
+        if (!tieneProductosValidos) {
+            e.preventDefault();
+            alert('Debe agregar al menos un producto a la venta.');
+            return false;
+        }
+    });
+
+    // Inicializar cálculos para productos existentes
+    document.querySelectorAll('.producto-item').forEach(item => {
+        const productoSelect = item.querySelector('.producto-select');
+        const selectedOption = productoSelect.options[productoSelect.selectedIndex];
+        if (selectedOption.value) {
+            const stock = parseInt(selectedOption.dataset.stock);
+            const nombre = selectedOption.dataset.nombre;
+            const cantidadInput = item.querySelector('.cantidad-input');
+            validarStock(item, cantidadInput.value, stock, nombre);
+        }
+    });
+
+    // Inicializar cálculos
+    actualizarContadorProductos();
+    actualizarBotonesEliminar();
+    actualizarTotal();
+});
+</script>
+
+<style>
+    .form-control:focus, .form-select:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+    
+    .producto-item {
+        border-left: 4px solid #ffc107;
+        transition: all 0.3s ease;
+    }
+    
+    .producto-item:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .eliminar-producto {
+        margin-top: 28px;
+    }
+    
+    #total-venta {
+        font-weight: bold;
+    }
+    
+    .stock-warning {
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+    
+    .is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Actualizar Empleado{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Actualizar Empleado</h1>
+    <form method="post" enctype="multipart/form-data"> {# ¡Importante! #}
+        {% csrf_token %}
+        {{ form.as_p }}
+        {% if form.instance.foto %}
+            <p>Foto actual:</p>
+            <img src="{{ form.instance.foto.url }}" alt="{{ form.instance.nombre }}" width="100" class="img-thumbnail mb-3">
+        {% endif %}
+        <button type="submit" class="btn btn-success">Actualizar Empleado</button>
+        <a href="{% url 'ver_empleados' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}

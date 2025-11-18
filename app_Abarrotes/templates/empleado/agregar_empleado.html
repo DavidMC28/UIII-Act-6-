@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Agregar Empleado{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Agregar Nuevo Empleado</h1>
+    <form method="post" enctype="multipart/form-data"> {# ¡Importante para subir archivos! #}
+        {% csrf_token %}
+        {{ form.as_p }} {# Esto renderiza todos los campos del formulario, incluyendo el de la foto #}
+        <button type="submit" class="btn btn-success">Guardar Empleado</button>
+        <a href="{% url 'ver_empleados' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}

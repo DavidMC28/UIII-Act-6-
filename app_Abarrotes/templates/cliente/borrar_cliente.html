@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Cliente{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Eliminar Cliente</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
+                        <h5>¿Estás seguro de que quieres eliminar este cliente?</h5>
+                        <p class="mb-0"><strong>{{ cliente.nombre }}</strong></p>
+                        <p class="text-muted">Teléfono: {{ cliente.telefono }} | Correo: {{ cliente.correo }}</p>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body text-start">
+                            <p><strong>Nombre:</strong> {{ cliente.nombre }}</p>
+                            <p><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+                            <p><strong>Correo:</strong> {{ cliente.correo }}</p>
+                            <p><strong>Dirección:</strong> {{ cliente.direccion }}</p>
+                            <p><strong>Empleado Asignado:</strong> {{ cliente.id_empleado.nombre }} {{ cliente.id_empleado.apellido }}</p>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'ver_clientes' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>Eliminar Cliente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Proveedor{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Eliminar Proveedor</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
+                        <h5>¿Estás seguro de que quieres eliminar este proveedor?</h5>
+                        <p class="mb-0"><strong>{{ proveedor.empresa }}</strong></p>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body text-start">
+                            <p><strong>Empresa:</strong> {{ proveedor.empresa }}</p>
+                            <p><strong>Contacto:</strong> {{ proveedor.contacto }}</p>
+                            <p><strong>Teléfono:</strong> {{ proveedor.telefono }}</p>
+                            <p><strong>Email:</strong> {{ proveedor.email }}</p>
+                            <p><strong>Categoría:</strong> {{ proveedor.categoria }}</p>
+                            <p><strong>Productos:</strong> {{ proveedor.productos }}</p>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'ver_proveedores' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>Eliminar Proveedor
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
